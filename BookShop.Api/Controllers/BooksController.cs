@@ -78,5 +78,20 @@ namespace BookShop.Api.Controllers
             await _bookRepository.CreateBookAsync(aBook);
             return CreatedAtRoute(nameof(GetBook), new { id = aBook.BookId }, aBook);
         }
+
+        // DELETE: api/books/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteBook(long id)
+        {
+            var aBook = await _bookRepository.FindAsync(id);
+
+            if (aBook == null)
+            {
+                return NotFound();
+            }
+
+            await _bookRepository.DeleteBookAsync(id);
+            return NoContent();
+        }
     }
 }

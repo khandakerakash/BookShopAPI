@@ -20,16 +20,14 @@ namespace BookShop.Api.Services
 
         public async Task<IEnumerable<Book>> GetBooksAsync()
         {
-            return await _context.Books.Include(x => x.Author)
-                .Include(x => x.BookCategories)
-                .ToListAsync();
+            //return await _context.Books.Include(x => x.Author).Include(x => x.BookCategories).ToListAsync();
+            return await _context.Books.Include(x => x.BookCategories).ToListAsync();
         }
 
         public async Task<Book> GetBookAsync(long id)
         {
-            return await _context.Books.Include(x => x.Author)
-                .Include(x => x.BookCategories)
-                .FirstOrDefaultAsync(x => x.BookId == id);
+            //return await _context.Books.Include(x => x.Author).Include(x => x.BookCategories).FirstOrDefaultAsync(x => x.BookId == id);
+            return await _context.Books.Include(x => x.BookCategories).FirstOrDefaultAsync(x => x.BookId == id);
         }
 
         public async Task CreateBookAsync(Book book)

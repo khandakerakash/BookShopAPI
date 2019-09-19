@@ -20,7 +20,8 @@ namespace BookShop.Api.Services
 
         public async Task<IEnumerable<Author>> GetAuthorsAsync()
         {
-            return await _context.Authors.Include(x => x.Books).ToListAsync();
+            //return await _context.Authors.Include(x => x.Books).ToListAsync();
+            return await _context.Authors.ToListAsync();
         }
 
         public async Task<Author> GetAuthorAsync(long id)

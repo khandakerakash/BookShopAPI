@@ -156,8 +156,8 @@ namespace BookShop.Api
 
             // Register the `User Authentication` services in Configure Container
             app.UseAuthentication();
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseHttpsRedirection();
             app.UseMvc();
         }
     }
