@@ -34,13 +34,14 @@ namespace BookShop.Api.Services
 
         public async Task<IEnumerable<Category>> GetCategoriesAsync()
         {
-            return await _context.Categories.Include(x => x.BookCategories).ToListAsync();
+            return await _context.Categories.Include(x => x.BookCategories)
+                .ThenInclude(x => x.Book).ToListAsync();
         }
 
         public async Task<Category> GetCategoryAsync(long id)
         {
             return await _context.Categories.Include(x => x.BookCategories)
-                .FirstOrDefaultAsync(x => x.CategoryId == id);
+                .ThenInclude(x => x.Book).FirstOrDefaultAsync(x => x.CategoryId == id);
         }
 
         public async Task<Category> CreateCategoryAsync(AddCategoryRequestModel requestModel)
