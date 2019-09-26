@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Bogus;
 using BookShop.Api.Contexts;
 using BookShop.Api.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookShop.Api.Controllers
 {
@@ -14,75 +16,139 @@ namespace BookShop.Api.Controllers
     [ApiController]
     public class TestController : ControllerBase
     {
-        public readonly RoleManager<IdentityRole> roleManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly ApplicationDbContext _context;
 
-        public TestController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+        public TestController(RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
-            this.roleManager = roleManager;
+            _roleManager = roleManager;
             this.userManager = userManager;
             _context = context;
         }
         // seed the database with some dummy role and user
         // GET: api/test
         [HttpGet]
-        public async Task Get()
+        public string Get()
         {
-            await roleManager.CreateAsync(new IdentityRole()
+//           await  InsertUser();
+
+          //  await CategoryListGenerate();
+            return null;
+        }
+
+        private async Task CategoryListGenerate()
+        {
+            var userlist = await _context.Users.ToListAsync();
+
+
+            var categoryFaker = new Faker<Category>()
+                .RuleFor(o => o.Name, f => f.Name.FullName())
+                .RuleFor(o => o.Description, f => f.Lorem.Paragraph());
+            var categoryList = categoryFaker.Generate(1000).ToList();
+            foreach (var category in categoryList)
+            {
+                var random = new Random();
+                int index = random.Next(userlist.Count);
+                category.ApplicationUserId = userlist.ElementAt(index).Id;
+                await _context.Categories.AddAsync(category);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task InsertUser()
+        {
+            await _roleManager.CreateAsync(new ApplicationRole()
             {
                 Name = "owner"
             });
-            await roleManager.CreateAsync(new IdentityRole()
+            await _roleManager.CreateAsync(new ApplicationRole()
             {
                 Name = "manager"
             });
-            await roleManager.CreateAsync(new IdentityRole()
+            await _roleManager.CreateAsync(new ApplicationRole()
             {
                 Name = "customer"
             });
 
-            var owner = await userManager.CreateAsync(new ApplicationUser()
+            var list = new List<string> { "owner", "manager", "customer" };
+            var userList = new List<ApplicationUser>()
             {
-                Email = "akash.cse10@gmail.com",
-                PhoneNumber = "01670047320",
-                UserName = "akash.cse10@gmail.com"
-            }, "Akash&core007");
+                new ApplicationUser()
+                {
+                    PhoneNumber = "01670047320",
+                    UserName = "akash.cse10@gmail.com"
+                },
+                new ApplicationUser()
+                {
+                    PhoneNumber = "01670047321",
+                    UserName = "akash1.cse10@gmail.com"
+                },
+                new ApplicationUser()
+                {
+                    PhoneNumber = "01670047322",
+                    UserName = "akash2.cse10@gmail.com"
+                },
+                new ApplicationUser()
+                {
+                    PhoneNumber = "01670047323",
+                    UserName = "akash3.cse10@gmail.com"
+                },
+                new ApplicationUser()
+                {
+                    PhoneNumber = "01670047324",
+                    UserName = "akash4.cse10@gmail.com"
+                },
+                new ApplicationUser()
+                {
+                    PhoneNumber = "01670047325",
+                    UserName = "akash5.cse10@gmail.com"
+                },
+                new ApplicationUser()
+                {
+                    PhoneNumber = "01670047326",
+                    UserName = "akash6.cse10@gmail.com"
+                },
+                new ApplicationUser()
+                {
+                    PhoneNumber = "01670047327",
+                    UserName = "akash7.cse10@gmail.com"
+                },
+                new ApplicationUser()
+                {
+                    PhoneNumber = "01670047328",
+                    UserName = "akash8.cse10@gmail.com"
+                },
+                new ApplicationUser()
+                {
+                    PhoneNumber = "01670047329",
+                    UserName = "akash9.cse10@gmail.com"
+                },
+                new ApplicationUser()
+                {
+                    PhoneNumber = "01670047330",
+                    UserName = "akash10.cse10@gmail.com"
+                },
+            };
 
-            if (owner.Succeeded)
+            foreach (var aUser in userList)
             {
+                var owner = await userManager.CreateAsync(new ApplicationUser()
+                {
+                    Email = aUser.UserName,
+                    PhoneNumber = aUser.PhoneNumber,
+                    UserName = aUser.UserName,
+                }, "Akash&core007");
 
-                var nowInsertedUser = await userManager.FindByEmailAsync("akash.cse10@gmail.com");
-                var roleInsert = await userManager.AddToRoleAsync(nowInsertedUser, "owner");
+                if (owner.Succeeded)
+                {
+                    var random = new Random();
+                    int index = random.Next(list.Count);
+                    var nowInsertedUser = await userManager.FindByEmailAsync(aUser.UserName);
+                    var roleInsert = await userManager.AddToRoleAsync(nowInsertedUser, list[index]);
+                }
             }
-
-            var manager = await userManager.CreateAsync(new ApplicationUser()
-            {
-                Email = "akkubaby.cse10@gmail.com",
-                PhoneNumber = "01911946813",
-                UserName = "akkubaby.cse10@gmail.com"
-            }, "Akash&core007");
-
-            if (manager.Succeeded)
-            {
-
-                var nowInsertedUser1 = await userManager.FindByEmailAsync("akkubaby.cse10@gmail.com");
-                var roleInsert1 = await userManager.AddToRoleAsync(nowInsertedUser1, "manager");
-            }
-
-            //var customer = await userManager.CreateAsync(new ApplicationUser()
-            //{
-            //    Email = "khandakerakash007@gmail.com",
-            //    PhoneNumber = "01911946812",
-            //    UserName = "khandakerakash007@gmail.com"
-            //}, "Akash&core007");
-
-            //if (customer.Succeeded)
-            //{
-
-            //    var nowInsertedUser1 = await userManager.FindByEmailAsync("khandakerakash007@gmail.com");
-            //    var roleInsert1 = await userManager.AddToRoleAsync(nowInsertedUser1, "customer");
-            //}
         }
     }
 }

@@ -47,36 +47,31 @@ namespace BookShop.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBook([FromForm] AddBookRequestModel request)
         {
+            request.Myuser = User;
 
-            if (request == null)
+            var book = await _bookRepository.CreateBookAsync(request);
+
+            if (book != null)
             {
-                return BadRequest();
+                return Ok(book);
             }
 
-            Book aBook = new Book()
-            {
-                Title = request.Title,
-                Description = request.Description,
-                Price = request.Price,
-                Quantity = request.Quantity,
-                //CategoryId = request.CategoryId,
-                IsApproved = false,
-                AuthorId = request.AuthorId
-            };
+            return BadRequest();
+        }
 
-            if (request.Image != null && request.Image.Length > 0)
+        // PUT: api/books/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCategory(long id, [FromForm] UpdateBookRequestModel request)
+        {
+
+            var book = await _bookRepository.UpdateBookAsync(id, request);
+            if (book != null)
             {
-                var fileName = Path.GetFileName(request.Image.FileName);
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images", fileName);
-                using (var fileSteam = new FileStream(filePath, FileMode.Create))
-                {
-                    await request.Image.CopyToAsync(fileSteam);
-                }
-                aBook.Image = fileName;
+                return Ok(book);
             }
 
-            await _bookRepository.CreateBookAsync(aBook);
-            return CreatedAtRoute(nameof(GetBook), new { id = aBook.BookId }, aBook);
+            return BadRequest();
+
         }
 
         // DELETE: api/books/5

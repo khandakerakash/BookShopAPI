@@ -39,7 +39,8 @@ namespace BookShop.Api
             // Adding MVC, Version and FluentValidation
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-                .AddFluentValidation();
+                .AddFluentValidation()
+                .AddJsonOptions(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
             // Register the Swagger for creating better documentation
             services.AddSwaggerGen(c =>
@@ -59,10 +60,10 @@ namespace BookShop.Api
                 });
 
             // Register the Identity services.
-            services.AddDefaultIdentity<ApplicationUser>()
-                .AddRoles<IdentityRole>()
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
 
             // Register the Identity Service Options.
             services.Configure<IdentityOptions>(options =>
@@ -121,6 +122,7 @@ namespace BookShop.Api
 
             // Register the Repository service and RequestModel
             services.AddTransient<IValidator<AddBookRequestModel>, AddBookRequestModelValidator>();
+            services.AddTransient<IValidator<UpdateBookRequestModel>, UpdateBookRequestValidator>();
             services.AddTransient<IBookRepository, BookRepository>();
             services.AddTransient<IValidator<AddCategoryRequestModel>, AddCategoryRequestModelValidation>();
             services.AddTransient<IValidator<UpdateCategoryRequestModel>, UpdateCategoryRequestModelValidation>();

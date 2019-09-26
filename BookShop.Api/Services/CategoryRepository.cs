@@ -1,13 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using BookShop.Api.Contexts;
 using BookShop.Api.Models;
+using BookShop.Api.RequestResponse.Request;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookShop.Api.Services
 {
+    public interface ICategoryRepository
+    {
+        Task<IEnumerable<Category>> GetCategoriesAsync();
+        Task<Category> GetCategoryAsync(long id);
+        Task<Category> CreateCategoryAsync(AddCategoryRequestModel requestModel);
+        Task<Category> UpdateCategoryAsync(long id, UpdateCategoryRequestModel request);
+        Task DeleteCategoryAsync(long id);
+
+        Task<Category> FindAsync(long id);
+
+        Task<bool> CheckNameAlreadyExits(string name, CancellationToken token);
+        //Task<bool> CategoryExists(long id, string title);
+    }
     public class CategoryRepository : ICategoryRepository, IDisposable
     {
         private ApplicationDbContext _context;
@@ -28,23 +43,65 @@ namespace BookShop.Api.Services
                 .FirstOrDefaultAsync(x => x.CategoryId == id);
         }
 
-        public async Task CreateCategoryAsync(Category category)
+        public async Task<Category> CreateCategoryAsync(AddCategoryRequestModel requestModel)
         {
-            await _context.AddAsync(category);
-            await _context.SaveChangesAsync();
+            if (requestModel.Name != null)
+            {
+                requestModel.Name = requestModel.Name;
+            }
+
+            if (requestModel.Description != null)
+            {
+                requestModel.Description = requestModel.Description;
+            }
+
+            Category aCategory = new Category()
+            {
+                Name = requestModel.Name,
+                Description = requestModel.Description,
+            };
+
+            var applicationUserId = requestModel.Myuser.Claims.Where(c => c.Type == "sub")
+                .Select(c => c.Value).SingleOrDefault();
+
+            aCategory.ApplicationUserId = Convert.ToInt64(applicationUserId);
+
+            await _context.AddAsync(aCategory);
+
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return aCategory;
+            }
+
+            return null;
         }
 
-        public async Task UpdateCategoryAsync(Category category)
+        public async Task<Category> UpdateCategoryAsync(long id, UpdateCategoryRequestModel request)
         {
-            var categoryToUpdate =
-                await _context.Categories.FirstOrDefaultAsync(x => x.CategoryId == category.CategoryId);
-
-            if (categoryToUpdate != null)
+            var category = await FindAsync(id);
+            if (category == null)
             {
-                categoryToUpdate.Name = category.Name;
-                categoryToUpdate.Description = category.Description;
-                await _context.SaveChangesAsync();
+                return null;
             }
+
+            if (request.Name != null)
+            {
+                category.Name = request.Name;
+            }
+
+            if (request.Description != null)
+            {
+                category.Description = request.Description;
+            }
+
+
+            _context.Categories.Update(category);
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return category;
+            }
+
+            return null;
         }
 
         public async Task DeleteCategoryAsync(long id)
@@ -61,6 +118,13 @@ namespace BookShop.Api.Services
         public async Task<Category> FindAsync(long id)
         {
             return await _context.Categories.Where(x => x.CategoryId.Equals(id)).FirstOrDefaultAsync();
+        }
+
+
+        public async Task<bool> CheckNameAlreadyExits(string name, CancellationToken token)
+        {
+            var category = await _context.Categories.FirstOrDefaultAsync(x => x.Name == name);
+            return category == null;
         }
 
         public void Dispose()

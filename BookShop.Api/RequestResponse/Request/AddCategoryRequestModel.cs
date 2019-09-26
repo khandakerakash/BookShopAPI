@@ -7,10 +7,11 @@ using FluentValidation;
 
 namespace BookShop.Api.RequestResponse.Request
 {
-    public class AddCategoryRequestModel
+    public class AddCategoryRequestModel : LoginUserInformation
     {
         public string Name { get; set; }
         public string Description { get; set; }
+        //public long ApplicationUserId { get; set; }
     }
 
     public class AddCategoryRequestModelValidation : AbstractValidator<AddCategoryRequestModel>
@@ -20,8 +21,18 @@ namespace BookShop.Api.RequestResponse.Request
         public AddCategoryRequestModelValidation(ICategoryRepository categoryRepository)
         {
             _categoryRepository = categoryRepository;
-            RuleFor(x => x.Name).NotNull().MinimumLength(2).MaximumLength(100);
-            RuleFor(x => x.Description).NotNull().MinimumLength(20).MaximumLength(500);
+
+            When(d => !String.IsNullOrWhiteSpace(d.Name), () =>
+            {
+                RuleFor(x => x.Name).NotNull().MinimumLength(2).MaximumLength(100).MustAsync(_categoryRepository.CheckNameAlreadyExits);
+
+            });
+
+            When(d => !String.IsNullOrWhiteSpace(d.Description), () =>
+            {
+                RuleFor(x => x.Description).NotNull().MinimumLength(2).MaximumLength(100);
+
+            });
         }
     }
 }

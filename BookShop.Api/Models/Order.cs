@@ -16,9 +16,9 @@ namespace BookShop.Api.Models
         public string ShipZipCode { get; set; }
         public string ShipCountry { get; set; }
 
-        public string ApplicationUserId { get; set; }
+        public long ApplicationUserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
 
-        public List<OrderItem> OrderItems { get; set; }
+        
     }
 }

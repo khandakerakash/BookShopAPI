@@ -6,9 +6,10 @@ using Microsoft.AspNetCore.Identity;
 
 namespace BookShop.Api.Models
 {
-    public class ApplicationUser : IdentityUser
+    public class ApplicationUser : IdentityUser<long>
     {
         public string Address { get; set; }
+        public ICollection<Category> Categories { get; set; }
         public ICollection<Book> Books { get; set; }
     }
 }

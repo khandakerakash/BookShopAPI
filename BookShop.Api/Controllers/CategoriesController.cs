@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using BookShop.Api.Models;
 using BookShop.Api.RequestResponse.Request;
@@ -51,46 +52,32 @@ namespace BookShop.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateCategory([FromForm] AddCategoryRequestModel request)
         {
-            if (request == null)
+            request.Myuser = User;
+
+            var category =   await _categoryRepository.CreateCategoryAsync(request);
+
+            if (category != null)
             {
-                return BadRequest();
+                return Ok(category);
             }
 
-            Category aCategory = new Category()
-            {
-                Name = request.Name,
-                Description = request.Description
-            };
+            return BadRequest();
 
-            await _categoryRepository.CreateCategoryAsync(aCategory);
-
-            return CreatedAtRoute(nameof(GetCategory), new {id = aCategory.CategoryId}, aCategory);
         }
 
         // PUT: api/categories/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCategory(long id, [FromForm] UpdateCategoryRequestModel request)
         {
-            if (request == null)
+
+            var category = await _categoryRepository.UpdateCategoryAsync(id, request);
+            if (category != null)
             {
-                return BadRequest();
+                return Ok(category);
             }
 
-            var aCategory = await _categoryRepository.FindAsync(id);
+            return BadRequest();
 
-            if (aCategory == null)
-            {
-                return NotFound();
-            }
-
-            Category category = new Category()
-            {
-                Name = request.Name,
-                Description = request.Description
-            };
-
-            await _categoryRepository.UpdateCategoryAsync(category);
-            return NoContent();
         }
 
         // DELETE: api/categories/5

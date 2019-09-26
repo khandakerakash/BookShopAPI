@@ -11,9 +11,11 @@ namespace BookShop.Api.Models
         public string Name { get; set; }
         public string Description { get; set; }
 
-        public string ApplicationUserId { get; set; }
+        public long ApplicationUserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
 
-        public List<BookCategory> BookCategories { get; set; }
+
+        public ICollection<BookCategory> BookCategories { get; set; }
+
     }
 }
