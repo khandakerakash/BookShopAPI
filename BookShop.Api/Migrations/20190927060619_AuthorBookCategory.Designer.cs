@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookShop.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190926170250_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20190927060619_AuthorBookCategory")]
+    partial class AuthorBookCategory
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -106,9 +106,7 @@ namespace BookShop.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ApplicationUserId");
-
-                    b.Property<long?>("ApplicationUserId1");
+                    b.Property<long>("ApplicationUserId");
 
                     b.Property<string>("FirstName");
 
@@ -116,7 +114,7 @@ namespace BookShop.Api.Migrations
 
                     b.HasKey("AuthorId");
 
-                    b.HasIndex("ApplicationUserId1");
+                    b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Authors");
                 });
@@ -129,7 +127,7 @@ namespace BookShop.Api.Migrations
 
                     b.Property<long>("ApplicationUserId");
 
-                    b.Property<long?>("AuthorId");
+                    b.Property<long>("AuthorId");
 
                     b.Property<string>("Description");
 
@@ -451,7 +449,8 @@ namespace BookShop.Api.Migrations
                 {
                     b.HasOne("BookShop.Api.Models.ApplicationUser", "ApplicationUser")
                         .WithMany()
-                        .HasForeignKey("ApplicationUserId1");
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("BookShop.Api.Models.Book", b =>
@@ -461,9 +460,10 @@ namespace BookShop.Api.Migrations
                         .HasForeignKey("ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("BookShop.Api.Models.Author")
+                    b.HasOne("BookShop.Api.Models.Author", "Author")
                         .WithMany("Books")
-                        .HasForeignKey("AuthorId");
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("BookShop.Api.Models.BookCategory", b =>

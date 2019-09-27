@@ -7,17 +7,17 @@ using FluentValidation;
 
 namespace BookShop.Api.RequestResponse.Request
 {
-    public class AuthorRequestModel
+    public class AddAuthorRequestModel : LoginUserInformation
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
     }
 
-    public class AuthorRequestModelValidator : AbstractValidator<AuthorRequestModel>
+    public class AddAuthorRequestModelValidator : AbstractValidator<AddAuthorRequestModel>
     {
         private readonly IAuthorRepository _authorRepository;
 
-        public AuthorRequestModelValidator(IAuthorRepository authorRepository)
+        public AddAuthorRequestModelValidator(IAuthorRepository authorRepository)
         {
             _authorRepository = authorRepository;
             RuleFor(x => x.FirstName).NotNull().MaximumLength(20);

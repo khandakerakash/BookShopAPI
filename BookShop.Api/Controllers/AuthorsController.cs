@@ -49,49 +49,32 @@ namespace BookShop.Api.Controllers
 
         // POST: api/authors
         [HttpPost]
-        public async Task<IActionResult> CreateAuthor([FromForm] AuthorRequestModel request)
+        public async Task<IActionResult> CreateAuthor([FromForm] AddAuthorRequestModel request)
         {
-            if (request == null)
+            request.Myuser = User;
+
+            var author = await _authorRepository.CreateAuthorAsync(request);
+
+            if (author != null)
             {
-                return BadRequest();
+                return Ok(author);
             }
 
-            Author author = new Author()
-            {
-                FirstName = request.FirstName,
-                LastName = request.LastName
-            };
-
-            await _authorRepository.CreateAuthorAsync(author);
-
-            return CreatedAtRoute(nameof(GetAuthor), new {id = author.AuthorId}, author);
+            return BadRequest();
         }
 
         // PUT: api/authors/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAuthor(long id, [FromForm] AuthorRequestModel request)
+        public async Task<IActionResult> UpdateAuthor(long id, [FromForm] UpdateAuthorRequestModel request)
         {
-            if (request == null)
+            var author = await _authorRepository.UpdateAuthorAsync(id, request);
+
+            if (author != null)
             {
-                return BadRequest();
+                return Ok(author);
             }
 
-            var aAuthor = await _authorRepository.FindAsync(id);
-
-            if (aAuthor == null)
-            {
-                return NotFound();
-            }
-
-            Author author = new Author()
-            {
-                FirstName = request.FirstName,
-                LastName = request.LastName
-            };
-
-            await _authorRepository.UpdateAuthorAsync(author);
-
-            return NoContent();
+            return BadRequest();
         }
 
         // DELETE: api/products/5

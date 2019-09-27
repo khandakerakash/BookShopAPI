@@ -18,6 +18,9 @@ namespace BookShop.Api.Models
         public long ApplicationUserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
 
+        public long AuthorId { get; set; }
+        public Author Author { get; set; }
+
         public ICollection<BookCategory> BookCategories { get; set; }
         
     }

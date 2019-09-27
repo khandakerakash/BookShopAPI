@@ -127,7 +127,8 @@ namespace BookShop.Api
             services.AddTransient<IValidator<AddCategoryRequestModel>, AddCategoryRequestModelValidation>();
             services.AddTransient<IValidator<UpdateCategoryRequestModel>, UpdateCategoryRequestModelValidation>();
             services.AddTransient<ICategoryRepository, CategoryRepository>();
-            services.AddTransient<IValidator<AuthorRequestModel>, AuthorRequestModelValidator>();
+            services.AddTransient<IValidator<AddAuthorRequestModel>, AddAuthorRequestModelValidator>();
+            services.AddTransient<IValidator<UpdateAuthorRequestModel>, UpdateAuthorRequestModelValidator>();
             services.AddTransient<IAuthorRepository, AuthorRepository>();
             services.AddTransient<IValidator<RegistrationRequestModel>, RegistrationRequestModelValidator>();
             services.AddTransient<ILoginService, LoginService>();

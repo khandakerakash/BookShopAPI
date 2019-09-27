@@ -29,12 +29,12 @@ namespace BookShop.Api.Controllers
         // seed the database with some dummy role and user
         // GET: api/test
         [HttpGet]
-        public string Get()
+        public async Task Get()
         {
-//           await  InsertUser();
+            //await  InsertUser();
 
-          //  await CategoryListGenerate();
-            return null;
+            //  await CategoryListGenerate();
+            // return null;
         }
 
         private async Task CategoryListGenerate()

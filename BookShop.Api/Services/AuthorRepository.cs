@@ -5,10 +5,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using BookShop.Api.Contexts;
 using BookShop.Api.Models;
+using BookShop.Api.RequestResponse.Request;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookShop.Api.Services
 {
+    public interface IAuthorRepository
+    {
+        Task<IEnumerable<Author>> GetAuthorsAsync();
+        Task<Author> GetAuthorAsync(long id);
+        Task<Author> CreateAuthorAsync(AddAuthorRequestModel request);
+        Task<Author> UpdateAuthorAsync(long id, UpdateAuthorRequestModel request);
+        Task DeleteAuthorAsync(long id);
+
+        Task<Author> FindAsync(long id);
+    }
+
     public class AuthorRepository : IAuthorRepository, IDisposable
     {
         private ApplicationDbContext _context;
@@ -20,8 +32,7 @@ namespace BookShop.Api.Services
 
         public async Task<IEnumerable<Author>> GetAuthorsAsync()
         {
-            //return await _context.Authors.Include(x => x.Books).ToListAsync();
-            return await _context.Authors.ToListAsync();
+            return await _context.Authors.Include(x => x.Books).ToListAsync();
         }
 
         public async Task<Author> GetAuthorAsync(long id)
@@ -30,22 +41,56 @@ namespace BookShop.Api.Services
                 .FirstOrDefaultAsync(x => x.AuthorId == id);
         }
 
-        public async Task CreateAuthorAsync(Author author)
+        public async Task<Author> CreateAuthorAsync(AddAuthorRequestModel request)
         {
-            await _context.Authors.AddAsync(author);
-            await _context.SaveChangesAsync();
+            Author author = new Author()
+            {
+                FirstName = request.FirstName,
+                LastName = request.LastName
+            };
+
+            var applicationUserId = request.Myuser.Claims.Where(c => c.Type == "sub")
+                .Select(c => c.Value).SingleOrDefault();
+
+            author.ApplicationUserId = Convert.ToInt64(applicationUserId);
+
+            await _context.AddAsync(author);
+
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return author;
+            }
+
+            return null;
         }
 
-        public async Task UpdateAuthorAsync(Author author)
+        public async Task<Author> UpdateAuthorAsync(long id, UpdateAuthorRequestModel request)
         {
-            var authorToUpdate = await _context.Authors.FirstOrDefaultAsync(x => x.AuthorId == author.AuthorId);
+            var author = await FindAsync(id);
 
-            if (authorToUpdate !=null)
+            if (author == null)
             {
-                authorToUpdate.FirstName = author.FirstName;
-                authorToUpdate.LastName = author.LastName;
-                await _context.SaveChangesAsync();
+                return null;
             }
+
+            if (request.FirstName != null)
+            {
+                author.FirstName = request.FirstName;
+            }
+
+            if (request.LastName != null)
+            {
+                author.LastName = request.LastName;
+            }
+
+            _context.Authors.Update(author);
+
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return author;
+            }
+
+            return null;
         }
 
         public async Task DeleteAuthorAsync(long id)

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BookShop.Api.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class AuthorBookCategory : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -202,18 +202,17 @@ namespace BookShop.Api.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     FirstName = table.Column<string>(nullable: true),
                     LastName = table.Column<string>(nullable: true),
-                    ApplicationUserId = table.Column<string>(nullable: true),
-                    ApplicationUserId1 = table.Column<long>(nullable: true)
+                    ApplicationUserId = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Authors", x => x.AuthorId);
                     table.ForeignKey(
-                        name: "FK_Authors_AspNetUsers_ApplicationUserId1",
-                        column: x => x.ApplicationUserId1,
+                        name: "FK_Authors_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -300,7 +299,7 @@ namespace BookShop.Api.Migrations
                     Quantity = table.Column<int>(nullable: false),
                     IsApproved = table.Column<bool>(nullable: false),
                     ApplicationUserId = table.Column<long>(nullable: false),
-                    AuthorId = table.Column<long>(nullable: true)
+                    AuthorId = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -417,9 +416,9 @@ namespace BookShop.Api.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Authors_ApplicationUserId1",
+                name: "IX_Authors_ApplicationUserId",
                 table: "Authors",
-                column: "ApplicationUserId1");
+                column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BookCategories_CategoryId",

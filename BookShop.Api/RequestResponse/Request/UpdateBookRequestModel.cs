@@ -16,6 +16,8 @@ namespace BookShop.Api.RequestResponse.Request
         //public IFormFile Image { get; set; }
         public decimal Price { get; set; }
         public int Quantity { get; set; }
+
+        public long AuthorId { get; set; }
         public List<long> CategoryId { get; set; }
     }
 
@@ -49,8 +51,13 @@ namespace BookShop.Api.RequestResponse.Request
 
             //RuleFor(x => x.Image).NotNull();
 
-            //RuleFor(x => x.AuthorId).NotNull().GreaterThan(0)
-               // .MustAsync(_bookRepository.AuthorExists).WithMessage("This author Id is not our system.");
+            When(d => d.AuthorId > 0, () =>
+            {
+                RuleFor(x => x.AuthorId).NotNull().GreaterThan(0)
+                    .MustAsync(_bookRepository.AuthorExists).WithMessage("This author Id is not our system.");
+            });
+
+            
             //RuleFor(x => x.CategoryId).NotNull().GreaterThan(0).MustAsync(_bookRepository.CategoryExists).WithMessage("This category Id is not our system.");
         }
     }

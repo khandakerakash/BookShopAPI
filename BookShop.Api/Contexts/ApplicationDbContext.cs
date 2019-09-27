@@ -28,6 +28,7 @@ namespace BookShop.Api.Contexts
 
             modelBuilder.Entity<BookCategory>()       // THIS IS FIRST
                 .HasOne(u => u.Category).WithMany(u => u.BookCategories).IsRequired().OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<BookCategory>()
                 .HasKey(bc => new { bc.BookId, bc.CategoryId });
             modelBuilder.Entity<BookCategory>()
@@ -38,6 +39,12 @@ namespace BookShop.Api.Contexts
                 .HasOne(bc => bc.Category)
                 .WithMany(c => c.BookCategories)
                 .HasForeignKey(bc => bc.CategoryId);
+
+            modelBuilder.Entity<Book>()
+                .HasOne(e => e.Author)
+                .WithMany(e => e.Books)
+                .HasForeignKey(e => e.AuthorId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
         }

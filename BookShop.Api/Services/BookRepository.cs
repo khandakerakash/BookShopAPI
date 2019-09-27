@@ -72,6 +72,7 @@ namespace BookShop.Api.Services
                 Price = request.Price,
                 Quantity = request.Quantity,
                 IsApproved = false,
+                AuthorId = request.AuthorId,
                 BookCategories = bookCategory
             };
 
@@ -144,6 +145,11 @@ namespace BookShop.Api.Services
             if (request.Price != 0)
             {
                 book.Price = request.Price;
+            }
+
+            if (request.AuthorId != 0)
+            {
+                book.AuthorId = request.AuthorId;
             }
 
             _context.Books.Update(book);
