@@ -57,8 +57,10 @@ namespace BookShop.Api.RequestResponse.Request
                     .MustAsync(_bookRepository.AuthorExists).WithMessage("This author Id is not our system.");
             });
 
-            
-            //RuleFor(x => x.CategoryId).NotNull().GreaterThan(0).MustAsync(_bookRepository.CategoryExists).WithMessage("This category Id is not our system.");
+//            When(d => d.CategoryId > 0, () =>
+//            {
+//                RuleFor(x => x.CategoryId).NotNull().GreaterThan(0).MustAsync(_bookRepository.CategoryExists).WithMessage("This category Id is not our system.");
+//            });
         }
     }
 }
